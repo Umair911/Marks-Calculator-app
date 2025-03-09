@@ -220,7 +220,7 @@
 
         .choice-box:hover {
             transform: translateX(5px);
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(79, 70, 229, 0.2));
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba   (79, 70, 229, 0.2));
             border-color: rgba(99, 102, 241, 0.4);
         }
 
@@ -430,34 +430,61 @@
                 0 0 15px rgba(99, 102, 241, 0.4);
             border: 2px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
+            will-change: transform;
+            backface-visibility: hidden;
+        }
+
+        .pie-center::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: radial-gradient(circle at center,
+                rgba(255, 255, 255, 0.1) 0%,
+                transparent 70%
+            );
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+
+        .pie-center.animate {
+            animation: glowPulse 1.5s ease-in-out;
+        }
+
+        .pie-center.animate::after {
+            animation: fadeInOut 1.5s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
         }
 
         .pie-center .total-number {
-            font-size: 2.2rem;
-            font-weight: 800;
-            line-height: 1;
-            background: linear-gradient(135deg, #fff 0%, #f1f5f9 100%);
+            font-family: 'Inter', sans-serif;
+            font-size: 2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #e2e8f0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: numberPulse 2s ease-in-out infinite;
-            text-align: center;
-            min-width: 65px;
+            position: relative;
+            z-index: 2;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         .pie-center .total-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 1.2px;
-            margin-top: 0.2rem;
-            opacity: 0.9;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8em;
             text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        @keyframes numberPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: -5px;
+            position: relative;
+            z-index: 2;
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
 
         .long-question-parts {
@@ -706,9 +733,28 @@
         }
 
         @keyframes glowPulse {
-            0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.5); }
-            100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
+            0%, 100% {
+                box-shadow: 
+                    inset 0 4px 20px rgba(0, 0, 0, 0.3),
+                    0 0 15px rgba(99, 102, 241, 0.4);
+                background: radial-gradient(circle at center, 
+                    rgba(99, 102, 241, 0.2) 0%,
+                    rgba(79, 70, 229, 0.3) 50%,
+                    rgba(59, 130, 246, 0.2) 100%
+                );
+                filter: brightness(1);
+            }
+            50% {
+                box-shadow: 
+                    inset 0 4px 25px rgba(0, 0, 0, 0.4),
+                    0 0 35px rgba(99, 102, 241, 0.8);
+                background: radial-gradient(circle at center, 
+                    rgba(99, 102, 241, 0.4) 0%,
+                    rgba(79, 70, 229, 0.5) 50%,
+                    rgba(59, 130, 246, 0.4) 100%
+                );
+                filter: brightness(1.2);
+            }
         }
 
         .stats-grid {
@@ -1274,73 +1320,94 @@
             }, 3000);
         }
 
-        function calculate(isFromSuggestion = false) {
-            let totalMarks = parseInt(document.getElementById('totalMarks').value) || 0;
-            const mcqCount = parseInt(document.getElementById('mcqCount').value) || 0;
-            const shortCount = parseInt(document.getElementById('shortCount').value) || 0;
+        function calculate(isFromRandomize = false) {
+            const mcqs = parseInt(document.getElementById('mcqCount').value);
+            const shorts = parseInt(document.getElementById('shortCount').value);
+            const mcqMarks = mcqs * 1;
+            const shortMarks = shorts * 2;
             const longMarks = 8;
+            const totalCalculated = mcqMarks + shortMarks + longMarks;
             
-            const mcqMarks = mcqCount * 1;
-            const shortMarks = shortCount * 2;
-            let totalCalculated = mcqMarks + shortMarks + longMarks;
+            // Add animation to pie center
+            const pieCenter = document.querySelector('.pie-center');
+            pieCenter.classList.remove('animate');
+            void pieCenter.offsetWidth; // Trigger reflow
+            pieCenter.classList.add('animate');
 
-            // Update choice info based on total marks
-            const choiceInfo = document.getElementById('choiceInfo');
-            choiceInfo.textContent = totalCalculated <= 30 ? 'Choose 2 questions' : 'Choose 3 questions';
-
-            // Round to valid marks
-            const targetTotal = roundToValidMarks(totalCalculated);
-            if (targetTotal !== totalCalculated) {
-                const newMCQCount = adjustMCQsToReachTarget(totalCalculated, targetTotal);
-                totalCalculated = (newMCQCount * 1) + shortMarks + longMarks;
+            // Update pie center content and marks badge with animation
+            const totalDisplay = document.querySelector('.pie-center .total-number');
+            const totalMarksBadge = document.getElementById('totalMarksBadge');
+            
+            if (totalDisplay) {
+                animateNumber(totalDisplay, totalCalculated);
             }
-
-            document.getElementById('totalMarks').value = totalCalculated;
-            document.getElementById('totalMarksBadge').textContent = totalCalculated;
-
-            // Show preview panel
-            const previewPanel = document.getElementById('previewPanel');
-            previewPanel.style.display = 'block';
-
-            // Update pie chart
+            
+            if (totalMarksBadge) {
+                animateNumber(totalMarksBadge, totalCalculated);
+                
+                // Add a subtle pulse animation to the badge
+                const marksBadge = totalMarksBadge.closest('.marks-badge');
+                if (marksBadge) {
+                    marksBadge.classList.remove('success-pulse');
+                    void marksBadge.offsetWidth; // Trigger reflow
+                    marksBadge.classList.add('success-pulse');
+                }
+            }
+            
+            // Update pie chart distribution
             const mcqPercent = (mcqMarks / totalCalculated) * 100;
             const shortPercent = (shortMarks / totalCalculated) * 100;
             const longPercent = (longMarks / totalCalculated) * 100;
-
-            const mcqDeg = (mcqPercent / 100) * 360;
-            const shortDeg = ((mcqPercent + shortPercent) / 100) * 360;
-
-            const pieChart = document.getElementById('pieChart');
-            pieChart.style.setProperty('--mcq-deg', `${mcqDeg}deg`);
-            pieChart.style.setProperty('--short-deg', `${shortDeg}deg`);
-
-            // Update numbers with animations
-            const totalDisplay = document.getElementById('totalDisplay');
-            const totalNumber = totalDisplay.querySelector('.total-number');
-            animateNumber(totalNumber, totalCalculated);
-            animateNumber(document.getElementById('mcqValue'), mcqCount);
-            animateNumber(document.getElementById('shortValue'), shortCount);
-
+            
+            document.documentElement.style.setProperty('--mcq-deg', `${(mcqPercent / 100) * 360}deg`);
+            document.documentElement.style.setProperty('--short-deg', `${((mcqPercent + shortPercent) / 100) * 360}deg`);
+            
             // Update stat cards
-            updateStatCardMarks(document.querySelector('.stat-mcq'), '1 mark each');
-            updateStatCardMarks(document.querySelector('.stat-short'), '2 marks each');
-            updateStatCardMarks(document.querySelector('.stat-long'), '8 marks total');
-
-            // Update distribution bar
-            updateDistributionBar(mcqPercent, shortPercent, longPercent);
-
-            // Clear error message
-            const errorMsg = document.getElementById('errorMsg');
-            errorMsg.style.display = 'none';
-            errorMsg.classList.remove('error');
+            const mcqValue = document.getElementById('mcqValue');
+            const shortValue = document.getElementById('shortValue');
+            
+            if (mcqValue) animateNumber(mcqValue, mcqs);
+            if (shortValue) animateNumber(shortValue, shorts);
+            
+            const result = document.getElementById('result');
+            result.innerHTML = `
+                <h3>Distribution Results:</h3>
+                <p>MCQs: ${mcqs} × 1 = ${mcqMarks} marks (${Math.round(mcqMarks/totalCalculated*100)}%)</p>
+                <p>Short Questions: ${shorts} × 2 = ${shortMarks} marks (${Math.round(shortMarks/totalCalculated*100)}%)</p>
+                <p>Long Question: 1 × 8 = ${longMarks} marks (${Math.round(longMarks/totalCalculated*100)}%)</p>
+                <p style="font-size: 1.2em; font-weight: bold; margin-top: 15px;">
+                    Total Marks: ${totalCalculated}
+                </p>
+            `;
+            result.style.display = 'block';
 
             // Add to history
             addToHistory({
                 totalMarks: totalCalculated,
-                mcqCount,
-                shortCount,
+                mcqCount: mcqs,
+                shortCount: shorts,
                 timestamp: new Date().toLocaleTimeString()
             });
+        }
+
+        function animateNumber(element, finalNumber) {
+            const startNumber = parseInt(element.textContent) || 0;
+            const duration = 1000;
+            const steps = 20;
+            const stepDuration = duration / steps;
+            const increment = (finalNumber - startNumber) / steps;
+            let currentStep = 0;
+
+            const animation = setInterval(() => {
+                currentStep++;
+                const currentNumber = Math.round(startNumber + (increment * currentStep));
+                element.textContent = currentNumber;
+
+                if (currentStep >= steps) {
+                    clearInterval(animation);
+                    element.textContent = finalNumber;
+                }
+            }, stepDuration);
         }
 
         function suggestValidDistribution(totalMarks) {
@@ -1405,30 +1472,6 @@
                     setTimeout(() => card.classList.remove('success-pulse'), 500);
                 }, index * 150);
             });
-        }
-
-        function animateNumber(element, finalNumber) {
-            const duration = 1000;
-            const steps = 20;
-            const stepDuration = duration / steps;
-            const startNumber = parseInt(element.textContent) || 0;
-            const difference = finalNumber - startNumber;
-            let currentStep = 0;
-
-            const animation = setInterval(() => {
-                currentStep++;
-                const progress = currentStep / steps;
-                const currentNumber = Math.round(startNumber + (difference * progress));
-
-                if (currentStep >= steps) {
-                    element.textContent = finalNumber;
-                    clearInterval(animation);
-                    element.classList.add('success-pulse');
-                    setTimeout(() => element.classList.remove('success-pulse'), 500);
-                } else {
-                    element.textContent = currentNumber;
-                }
-            }, stepDuration);
         }
 
         function addToHistory(entry) {
