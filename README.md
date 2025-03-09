@@ -30,7 +30,7 @@ A smart web-based calculator for managing and distributing marks across differen
 
 ## Live Demo
 
-Access the calculator at: [Advanced Marks Calculator](https://your-username.github.io/calculator-marks/)
+Access the calculator at: [[Advanced Marks Calculator](https://your-username.github.io/calculator-marks/)](https://umair911.github.io/Marks-Calculator-app/)
 
 ## Development
 
