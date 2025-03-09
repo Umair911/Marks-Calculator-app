@@ -1063,9 +1063,89 @@
             from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* PWA Install Prompt Styles */
+        #installPrompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gradient-1);
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        #installPrompt button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #installPrompt button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        #installPrompt .close {
+            background: transparent;
+            padding: 4px;
+            margin-left: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translate(-50%, 100%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, 0);
+                opacity: 1;
+            }
+        }
+
+        /* Offline Indicator */
+        #offlineIndicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--gradient-3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
+    <div id="installPrompt">
+        <span>Install Advanced Marks Calculator</span>
+        <button id="installButton">Install Now</button>
+        <button class="close" onclick="closeInstallPrompt()">✕</button>
+    </div>
+    <div id="offlineIndicator">
+        <span>You're offline</span>
+    </div>
+    
     <div class="container">
         <div class="calculator-card">
             <div class="header">
@@ -1673,13 +1753,68 @@
         // Register Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.register('./sw.js')
                     .then(registration => {
                         console.log('ServiceWorker registration successful');
                     })
                     .catch(err => {
                         console.log('ServiceWorker registration failed: ', err);
                     });
+            });
+        }
+    </script>
+    <script>
+        // PWA Installation
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installButton = document.getElementById('installButton');
+        const offlineIndicator = document.getElementById('offlineIndicator');
+
+        // Check if PWA is already installed
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('PWA is installed');
+        }
+
+        // Handle PWA installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.style.display = 'flex';
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response to install prompt: ${outcome}`);
+            deferredPrompt = null;
+            installPrompt.style.display = 'none';
+        });
+
+        function closeInstallPrompt() {
+            installPrompt.style.display = 'none';
+        }
+
+        // Offline/Online Status
+        window.addEventListener('online', () => {
+            offlineIndicator.style.display = 'none';
+        });
+
+        window.addEventListener('offline', () => {
+            offlineIndicator.style.display = 'flex';
+        });
+
+        // Handle keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                document.querySelector('#calculateButton').click();
+            }
+        });
+
+        // Add to desktop shortcut for Windows
+        if (navigator.userAgent.includes('Windows')) {
+            window.addEventListener('appinstalled', () => {
+                console.log('PWA was installed');
             });
         }
     </script>
