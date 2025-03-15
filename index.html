@@ -1,4 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Previous HTML content with updated styles -->
+<!-- Previous HTML content with updated JavaScript -->
+<script>
+    function updateSuggestions() {
+        const totalMarks = parseInt(document.getElementById('totalMarks').value) || 0;
+        const roundedMarks = roundToValidMarks(totalMarks);
+        const suggestionsDiv = document.getElementById('suggestions');
+        let suggestions = '';
+
+        // Update short question choices based on total marks
+        const choiceInfo = document.getElementById('choiceInfo');
+        const minChoices = roundedMarks > 30 ? 3 : 2;
+        choiceInfo.textContent = `Choose any ${minChoices}`;
+        choiceInfo.classList.add('updating');
+        setTimeout(() => choiceInfo.classList.remove('updating'), 500);
+
+        if (roundedMarks >= 20) {
+            const longMarks = 8;
+            const remainingMarks = roundedMarks - longMarks;
+            const baseShortQuestions = Math.floor(remainingMarks * 0.6 / 2); // 60% for short questions
+            const baseMCQs = Math.min(8, Math.floor(remainingMarks * 0.4)); // 40% for MCQs
+            const totalShortQuestions = baseShortQuestions + (roundedMarks > 30 ? 3 : 2); // Add extra for choice based on marks
+
+            suggestions = `
+                <h3>Suggested Distributions (${roundedMarks} marks)</h3>
+                <div class="choice-box" onclick="applySuggestion(1, ${roundedMarks})">
+                    <p>
+                        <span>${baseMCQs} MCQ + ${totalShortQuestions} S/Q (choose ${minChoices}) + 1 L/Q</span>
+                        <span class="marks-total">${roundedMarks}m</span>
+                    </p>
+                    <div class="distribution-info">
+                        MCQ: ${baseMCQs}m • Short: ${baseShortQuestions * 2}m • Long: 8m
+                    </div>
+                </div>
+                <div class="choice-box" onclick="applySuggestion(2, ${roundedMarks})">
+                    <p>
+                        <span>${baseMCQs - 1} MCQ + ${totalShortQuestions + 1} S/Q (choose ${minChoices}) + 1 L/Q</span>
+                        <span class="marks-total">${roundedMarks}m</span>
+                    </p>
+                    <div class="distribution-info">
+                        MCQ: ${baseMCQs - 1}m • Short: ${(baseShortQuestions + 1) * 2}m • Long: 8m
+                    </div>
+                </div>
+                <div class="choice-box" onclick="applySuggestion(3, ${roundedMarks})">
+                    <p>
+                        <span>${baseMCQs + 1} MCQ + ${totalShortQuestions - 1} S/Q (choose ${minChoices}) + 1 L/Q</span>
+                        <span class="marks-total">${roundedMarks}m</span>
+                    </p>
+                    <div class="distribution-info">
+                        MCQ: ${baseMCQs + 1}m • Short: ${(baseShortQuestions - 1) * 2}m • Long: 8m
+                    </div>
+                </div>
+            `;
+        }
+
+        suggestionsDiv.innerHTML = suggestions;
+        document.getElementById('totalMarks').value = roundedMarks;
+        
+        // Update marks badge
+        const totalMarksBadge = document.getElementById('totalMarksBadge');
+        if (totalMarksBadge) {
+            animateNumber(totalMarksBadge, roundedMarks);
+        }
+
+        // Show choice info message
+        showAdjustmentMessage(`Short Questions: Choose any ${minChoices} from the given questions`);
+    }
+
+    function calculate(isFromRandomize = false) {
+        const mcqs = parseInt(document.getElementById('mcqCount').value);
+        const shorts = parseInt(document.getElementById('shortCount').value);
+        const mcqMarks = mcqs * 1;
+        const shortMarks = shorts * 2;
+        const longMarks = 8;
+        let totalCalculated = mcqMarks + shortMarks + longMarks;
+        
+        // Round to valid marks if needed
+        totalCalculated = roundToValidMarks(totalCalculated);
+        
+        // Update choice info based on total marks
+        const minChoices = totalCalculated > 30 ? 3 : 2;
+        const choiceInfo = document.getElementById('choiceInfo');
+        if (choiceInfo) {
+            choiceInfo.textContent = `Choose any ${minChoices}`;
+            choiceInfo.classList.add('updating');
+            setTimeout(() => choiceInfo.classList.remove('updating'), 500);
+        }
+
+        // Rest of the calculate function remains the same...
+        // (Previous calculate function code continues here)
+    }
+
+    // Rest of your JavaScript code remains the same...
+</script>
 </html>
