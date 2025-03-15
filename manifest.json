@@ -1,14 +1,14 @@
 {
     "name": "Advanced Marks Calculator",
     "short_name": "Marks Calc",
-    "description": "Smart marks distribution calculator for exams",
+    "description": "Smart distribution of marks for MCQs, Short Questions, and Long Questions",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
-    "display_override": ["window-controls-overlay"],
-    "background_color": "#0f172a",
-    "theme_color": "#0f172a",
+    "display_override": ["window-controls-overlay", "standalone"],
     "orientation": "any",
+    "background_color": "#0f172a",
+    "theme_color": "#6366f1",
     "categories": ["education", "utilities"],
     "launch_handler": {
         "client_mode": ["focus-existing", "auto"]
@@ -17,33 +17,27 @@
     "edge_side_panel": {
         "preferred_width": 400
     },
-    "screenshots": [
-        {
-            "src": "screenshot.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide",
-            "label": "Calculator Interface"
-        }
-    ],
     "icons": [
         {
             "src": "icon-192.png",
-            "type": "image/png",
             "sizes": "192x192",
+            "type": "image/png",
             "purpose": "any maskable"
         },
         {
             "src": "icon-512.png",
-            "type": "image/png",
             "sizes": "512x512",
+            "type": "image/png",
             "purpose": "any maskable"
-        },
+        }
+    ],
+    "screenshots": [
         {
-            "src": "icon-monochrome.png",
+            "src": "screenshot-1.png",
+            "sizes": "1280x720",
             "type": "image/png",
-            "sizes": "512x512",
-            "purpose": "monochrome"
+            "form_factor": "wide",
+            "label": "Calculator main screen"
         }
     ],
     "shortcuts": [
@@ -52,6 +46,12 @@
             "url": "/?mode=quick",
             "description": "Open calculator in quick mode",
             "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+        },
+        {
+            "name": "Randomize",
+            "url": "/?mode=random",
+            "description": "Generate random distribution",
+            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
         }
     ],
     "file_handlers": [
@@ -59,7 +59,9 @@
             "action": "./",
             "accept": {
                 "text/markdown": [".md"]
-            }
+            },
+            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }],
+            "launch_type": "single-client"
         }
     ]
-} 
+}
