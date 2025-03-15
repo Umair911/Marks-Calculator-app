@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Marks Calculator</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -155,6 +158,32 @@
             button {
                 padding: 10px 20px;
             }
+
+            #totalMarksBadge {
+                top: 10px;
+                right: 10px;
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
         }
     </style>
 </head>
@@ -189,6 +218,7 @@
     </div>
 
     <div id="totalMarksBadge">50 marks</div>
+    <div id="notification" class="notification"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -196,6 +226,13 @@
 
         function roundToValidMarks(marks) {
             return Math.max(20, Math.min(100, Math.round(marks)));
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
         function updateSuggestions() {
@@ -257,6 +294,7 @@
                 animateNumber(totalMarksBadge, roundedMarks);
             }
 
+            showNotification(`Short Questions: Choose any ${minChoices} from the given questions`);
             calculate();
         }
 
@@ -353,6 +391,7 @@
             document.getElementById('mcqCount').value = mcqs;
             document.getElementById('shortCount').value = shorts;
             calculate();
+            showNotification('Distribution applied successfully!');
         }
 
         function randomizeDistribution() {
@@ -370,6 +409,7 @@
             document.getElementById('mcqCount').value = mcqs;
             document.getElementById('shortCount').value = shorts;
             calculate(true);
+            showNotification('Random distribution generated!');
         }
 
         function animateNumber(element, target) {
@@ -390,6 +430,19 @@
             }
             
             requestAnimationFrame(update);
+        }
+
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
         }
 
         // Initialize
