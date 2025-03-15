@@ -1,50 +1,84 @@
 # Advanced Marks Calculator
 
-Ap ko btaya jata hay is calculator ko istamal karnay ka tarika:
+A sophisticated web-based tool designed to streamline the process of marks distribution and examination paper structuring.
 
-## Calculator Kaise Use Karen
+## 🌐 Access the Calculator
+Visit: [Advanced Marks Calculator](https://umair911.github.io/Marks-Calculator-app/)
 
-1. **Total Marks Dalna**
-   - Sab se pehle total marks box main apne paper ke total marks dalen
-   - Calculator khud ba khud valid marks tak round kar dega
+## 📝 Overview
 
-2. **MCQs Ki Tadaad**
-   - MCQs ki tadaad box main multiple choice questions ki tadaad dalen
-   - Har MCQ 1 mark ki hogi
+The Advanced Marks Calculator is a specialized tool developed for educational professionals to efficiently structure examination papers while maintaining balanced assessment criteria. It automatically handles mark distribution across different question types while ensuring pedagogical standards are met.
 
-3. **Short Questions Ki Tadaad**
-   - Short questions ki tadaad box main dalen
-   - Har short question 2 marks ki hogi
-   - System khud bata dega ke kitne short questions attempt karne hain:
-     * 30 marks se ziada ke paper main: Koi 3 short questions
-     * 30 marks ya kam ke paper main: Koi 2 short questions
+## 🚀 Key Features
 
-4. **Long Question**
-   - Long question 8 marks ka hoga
-   - Ye by default shamil hota hai
+- **Intelligent Mark Distribution**: Automatically calculates and validates mark allocations
+- **Dynamic Question Choices**: Adapts short question requirements based on total marks
+- **Visual Analytics**: Real-time pie chart visualization of mark distribution
+- **Automated Suggestions**: Provides multiple valid distribution patterns
+- **Randomization**: Generates random yet balanced mark distributions
+- **Instant Validation**: Real-time verification of mark allocations
 
-5. **Suggestions Dekhna**
-   - "Show Suggestions" button press karen
-   - Calculator 3 mukhtalif combinations dikhaye ga
-   - Har combination main marks ki taqseem alag hogi
+## 📋 Usage Guide
 
-6. **Random Distribution**
-   - Agar ap chahte hain ke calculator khud marks ki taqseem kar de
-   - "Randomize" button press karen
+### 1. Total Marks Configuration
+- Input the total marks for the examination
+- System automatically adjusts to the nearest valid mark distribution
+- Supports standard examination patterns
 
-## Khaas Features
+### 2. Multiple Choice Questions (MCQs)
+- Specify the number of MCQs required
+- Each MCQ carries 1 mark
+- System validates against total marks constraint
 
-- **Auto-Adjustment**: Total marks daalne ke baad calculator khud valid marks tak adjust ho jata hai
-- **Dynamic Choices**: Total marks ke hisaab se short questions ke choices automatically set ho jate hain
-- **Visual Display**: Pie chart marks ki taqseem visual taur par dikhata hai
-- **Instant Updates**: Koi bhi value change karne par results foran update ho jate hain
+### 3. Short Questions Management
+- Enter the total number of short questions
+- Each short question carries 2 marks
+- Dynamic choice system:
+  * For papers > 30 marks: Choose any 3 questions
+  * For papers ≤ 30 marks: Choose any 2 questions
 
-## Note
+### 4. Long Question
+- Fixed at 8 marks
+- Automatically integrated into the distribution
+- Ensures comprehensive assessment capability
 
-- Long question hamesha 8 marks ka hoga
-- Short questions ki choice total marks pe depend karti hai
-- MCQs ki tadaad ap ki zaroorat ke mutabiq adjust ki ja sakti hai
+### 5. Distribution Suggestions
+- Click "Show Suggestions" for optimal distributions
+- System generates three distinct combinations
+- Each suggestion maintains educational assessment standards
+
+### 6. Randomization Feature
+- "Randomize" button for automatic distribution
+- Maintains balance between question types
+- Adheres to pedagogical requirements
+
+## ⚙️ Technical Specifications
+
+- **Mark Validation**: Automatic rounding to valid marks
+- **Distribution Algorithm**: Balanced allocation across question types
+- **Visual Representation**: Interactive pie chart using Chart.js
+- **Responsive Design**: Optimized for all devices
+- **Real-time Updates**: Instant recalculation on input changes
+
+## 📌 Important Notes
+
+1. Long question is consistently maintained at 8 marks
+2. Short question choices adapt based on total marks
+3. MCQ count is flexible within valid distribution constraints
+4. All distributions ensure pedagogical balance
+5. System prevents invalid mark combinations
+
+## 🤝 Support
+
+For technical assistance, feature requests, or bug reports, please:
+1. Open an issue in the GitHub repository
+2. Provide detailed information about your requirement/issue
+3. Include steps to reproduce (if reporting a bug)
+
+## 🔄 Updates
+
+The calculator is regularly updated to enhance functionality and user experience. Check the repository for the latest features and improvements.
 
 ---
 
-*Is calculator ko istamal kar ke ap asaani se paper ki marking scheme bana sakte hain. Kisi bhi qisam ki mushkil ya suggestion ke liye issues section main rabta karen.*
+*Developed with educational excellence in mind. For professional use in academic environments.*
