@@ -1,70 +1,50 @@
 # Advanced Marks Calculator
 
-A modern, intelligent calculator for exam mark distribution. This Progressive Web App (PWA) helps teachers and educators efficiently distribute marks between MCQs, Short Questions, and Long Questions.
+Ap ko btaya jata hay is calculator ko istamal karnay ka tarika:
 
-## 🌟 Features
+## Calculator Kaise Use Karen
 
-- **Smart Distribution**: Automatically suggests balanced mark distributions
-- **Standard Values**: Rounds to standard mark values (25, 30, 35, 40, 45, 50)
-- **Interactive UI**: Modern interface with real-time updates
-- **PWA Support**: Install as desktop or mobile app
-- **Offline Support**: Works without internet connection
-- **Responsive Design**: Works on all devices
+1. **Total Marks Dalna**
+   - Sab se pehle total marks box main apne paper ke total marks dalen
+   - Calculator khud ba khud valid marks tak round kar dega
 
-## 🚀 Quick Start
+2. **MCQs Ki Tadaad**
+   - MCQs ki tadaad box main multiple choice questions ki tadaad dalen
+   - Har MCQ 1 mark ki hogi
 
-Visit: [Advanced Marks Calculator](https://umair911.github.io/Marks-Calculator-app/)
+3. **Short Questions Ki Tadaad**
+   - Short questions ki tadaad box main dalen
+   - Har short question 2 marks ki hogi
+   - System khud bata dega ke kitne short questions attempt karne hain:
+     * 30 marks se ziada ke paper main: Koi 3 short questions
+     * 30 marks ya kam ke paper main: Koi 2 short questions
 
-### Installation Options
+4. **Long Question**
+   - Long question 8 marks ka hoga
+   - Ye by default shamil hota hai
 
-#### Desktop App
-1. Visit the website in Chrome/Edge
-2. Click the install prompt or installation icon in the address bar
-3. The app will install and create a desktop shortcut
+5. **Suggestions Dekhna**
+   - "Show Suggestions" button press karen
+   - Calculator 3 mukhtalif combinations dikhaye ga
+   - Har combination main marks ki taqseem alag hogi
 
-#### Mobile App
-1. Open the website on your phone
-2. Tap "Add to Home Screen"
-3. Access the calculator from your home screen
+6. **Random Distribution**
+   - Agar ap chahte hain ke calculator khud marks ki taqseem kar de
+   - "Randomize" button press karen
 
-## 💡 Usage
+## Khaas Features
 
-1. Enter total marks (25-50)
-2. Get instant suggestions for:
-   - MCQ distribution
-   - Short questions (with choice options)
-   - Long question
-3. View the distribution in an interactive pie chart
-4. Use keyboard shortcuts:
-   - `Ctrl + Enter`: Quick Calculate
-   - `Enter`: Calculate
+- **Auto-Adjustment**: Total marks daalne ke baad calculator khud valid marks tak adjust ho jata hai
+- **Dynamic Choices**: Total marks ke hisaab se short questions ke choices automatically set ho jate hain
+- **Visual Display**: Pie chart marks ki taqseem visual taur par dikhata hai
+- **Instant Updates**: Koi bhi value change karne par results foran update ho jate hain
 
-## 🛠️ Technical Details
+## Note
 
-- Built with vanilla JavaScript
-- PWA features:
-  - Service Worker for offline support
-  - Manifest for installation
-  - Cache API for performance
-- Modern CSS with animations
-- Responsive design principles
+- Long question hamesha 8 marks ka hoga
+- Short questions ki choice total marks pe depend karti hai
+- MCQs ki tadaad ap ki zaroorat ke mutabiq adjust ki ja sakti hai
 
-## 📱 Supported Platforms
+---
 
-- Windows (Desktop PWA)
-- Android (Mobile PWA)
-- iOS (Add to Home Screen)
-- All modern browsers
-
-## 🤝 Contributing
-
-Feel free to open issues or submit pull requests for improvements.
-
-## 📄 License
-
-MIT License - Feel free to use and modify
-
-## 👨‍💻 Developer
-
-Created by Umair
-- GitHub: [@Umair911](https://github.com/Umair911)
+*Is calculator ko istamal kar ke ap asaani se paper ki marking scheme bana sakte hain. Kisi bhi qisam ki mushkil ya suggestion ke liye issues section main rabta karen.*
