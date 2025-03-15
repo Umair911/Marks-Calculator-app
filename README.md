@@ -1,46 +1,70 @@
 # Advanced Marks Calculator
 
-A smart web-based calculator for managing and distributing marks across different question types in exams.
+A modern, intelligent calculator for exam mark distribution. This Progressive Web App (PWA) helps teachers and educators efficiently distribute marks between MCQs, Short Questions, and Long Questions.
 
-## Features
+## 🌟 Features
 
-- Automatic mark distribution for MCQs, Short Questions, and Long Questions
-- Smart suggestions based on total marks
-- Real-time preview with interactive pie chart
-- Keyboard navigation support
-- Mobile-responsive design
-- Automatic rounding to valid marks (25, 30, 35, 45, 50)
-- Visual feedback and animations
+- **Smart Distribution**: Automatically suggests balanced mark distributions
+- **Standard Values**: Rounds to standard mark values (25, 30, 35, 40, 45, 50)
+- **Interactive UI**: Modern interface with real-time updates
+- **PWA Support**: Install as desktop or mobile app
+- **Offline Support**: Works without internet connection
+- **Responsive Design**: Works on all devices
 
-## How to Use
+## 🚀 Quick Start
 
-1. Enter the total marks for your exam
-2. Adjust the number of MCQs and Short Questions
-3. Click "Calculate" to see the distribution
-4. Use the suggestions for optimal mark distribution
-5. View the detailed breakdown in the preview panel
+Visit: [Advanced Marks Calculator](https://umair911.github.io/Marks-Calculator-app/)
 
-## Technologies Used
+### Installation Options
 
-- HTML5
-- CSS3 (with modern features like CSS Grid, Flexbox)
-- JavaScript (Vanilla JS)
-- Modern animations and transitions
+#### Desktop App
+1. Visit the website in Chrome/Edge
+2. Click the install prompt or installation icon in the address bar
+3. The app will install and create a desktop shortcut
+
+#### Mobile App
+1. Open the website on your phone
+2. Tap "Add to Home Screen"
+3. Access the calculator from your home screen
+
+## 💡 Usage
+
+1. Enter total marks (25-50)
+2. Get instant suggestions for:
+   - MCQ distribution
+   - Short questions (with choice options)
+   - Long question
+3. View the distribution in an interactive pie chart
+4. Use keyboard shortcuts:
+   - `Ctrl + Enter`: Quick Calculate
+   - `Enter`: Calculate
+
+## 🛠️ Technical Details
+
+- Built with vanilla JavaScript
+- PWA features:
+  - Service Worker for offline support
+  - Manifest for installation
+  - Cache API for performance
+- Modern CSS with animations
 - Responsive design principles
 
-## Live Demo
+## 📱 Supported Platforms
 
-Access the calculator at: [Advanced Marks Calculator](https://your-username.github.io/calculator-marks/)
+- Windows (Desktop PWA)
+- Android (Mobile PWA)
+- iOS (Add to Home Screen)
+- All modern browsers
 
-## Development
+## 🤝 Contributing
 
-This project is open source and welcomes contributions. To run locally:
+Feel free to open issues or submit pull requests for improvements.
 
-1. Clone the repository
-2. Open `index.html` in your browser
-3. Make changes and test locally
-4. Submit pull requests for improvements
+## 📄 License
 
-## License
+MIT License - Feel free to use and modify
 
-MIT License - feel free to use and modify for your needs. 
+## 👨‍💻 Developer
+
+Created by Umair
+- GitHub: [@Umair911](https://github.com/Umair911) 

@@ -2,11 +2,30 @@
     "name": "Advanced Marks Calculator",
     "short_name": "Marks Calc",
     "description": "Smart marks distribution calculator for exams",
-    "start_url": "index.html",
+    "start_url": "./",
+    "scope": "./",
     "display": "standalone",
+    "display_override": ["window-controls-overlay"],
     "background_color": "#0f172a",
     "theme_color": "#0f172a",
-    "orientation": "portrait-primary",
+    "orientation": "any",
+    "categories": ["education", "utilities"],
+    "launch_handler": {
+        "client_mode": ["focus-existing", "auto"]
+    },
+    "handle_links": "preferred",
+    "edge_side_panel": {
+        "preferred_width": 400
+    },
+    "screenshots": [
+        {
+            "src": "screenshot.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Calculator Interface"
+        }
+    ],
     "icons": [
         {
             "src": "icon-192.png",
@@ -19,6 +38,28 @@
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "any maskable"
+        },
+        {
+            "src": "icon-monochrome.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "monochrome"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Quick Calculate",
+            "url": "/?mode=quick",
+            "description": "Open calculator in quick mode",
+            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+        }
+    ],
+    "file_handlers": [
+        {
+            "action": "./",
+            "accept": {
+                "text/markdown": [".md"]
+            }
         }
     ]
 } 
