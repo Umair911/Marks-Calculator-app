@@ -1,19 +1,17 @@
 const CACHE_NAME = 'marks-calculator-v2';
-const STATIC_CACHE = 'static-v2';
-const DYNAMIC_CACHE = 'dynamic-v2';
+const STATIC_CACHE = 'static-cache-v2';
+const DYNAMIC_CACHE = 'dynamic-cache-v2';
 
 const STATIC_ASSETS = [
     './',
-    './index.html',
-    './manifest.json',
-    './icon-192.png',
-    './icon-512.png',
-    './icon-monochrome.png',
-    './icon-96.png',
+    'index.html',
+    'manifest.json',
+    'icon-192.png',
+    'icon-512.png',
     'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap'
 ];
 
-// Install Event
+// Install event - cache static assets
 self.addEventListener('install', event => {
     event.waitUntil(
         Promise.all([
@@ -22,10 +20,9 @@ self.addEventListener('install', event => {
             caches.open(DYNAMIC_CACHE)
         ])
     );
-    self.skipWaiting();
 });
 
-// Activate Event
+// Activate event - clean up old caches
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(keys => {
@@ -35,76 +32,111 @@ self.addEventListener('activate', event => {
             );
         })
     );
-    return self.clients.claim();
 });
 
-// Fetch Event with Network-First Strategy for API calls and Cache-First for static assets
+// Fetch event - network first for dynamic content, cache first for static assets
 self.addEventListener('fetch', event => {
-    const url = new URL(event.request.url);
-    
-    // Static Assets: Cache First
-    if (STATIC_ASSETS.includes(url.pathname)) {
+    if (event.request.url.includes('/api/')) {
+        // Network first strategy for API calls
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    return caches.open(DYNAMIC_CACHE)
+                        .then(cache => {
+                            cache.put(event.request, response.clone());
+                            return response;
+                        });
+                })
+                .catch(() => caches.match(event.request))
+        );
+    } else if (STATIC_ASSETS.some(asset => event.request.url.includes(asset))) {
+        // Cache first strategy for static assets
         event.respondWith(
             caches.match(event.request)
                 .then(response => response || fetchAndCache(event.request))
         );
-        return;
+    } else {
+        // Network first with cache fallback for everything else
+        event.respondWith(
+            fetch(event.request)
+                .then(response => {
+                    return caches.open(DYNAMIC_CACHE)
+                        .then(cache => {
+                            cache.put(event.request, response.clone());
+                            return response;
+                        });
+                })
+                .catch(() => caches.match(event.request))
+        );
     }
-
-    // Dynamic Content: Network First
-    event.respondWith(
-        fetch(event.request)
-            .then(response => {
-                const clonedResponse = response.clone();
-                caches.open(DYNAMIC_CACHE)
-                    .then(cache => cache.put(event.request, clonedResponse));
-                return response;
-            })
-            .catch(() => caches.match(event.request))
-    );
 });
 
 // Helper function to fetch and cache
-async function fetchAndCache(request) {
-    const response = await fetch(request);
-    const cache = await caches.open(DYNAMIC_CACHE);
-    cache.put(request, response.clone());
-    return response;
+function fetchAndCache(request) {
+    return fetch(request).then(response => {
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+            return response;
+        }
+
+        const responseToCache = response.clone();
+        caches.open(DYNAMIC_CACHE)
+            .then(cache => cache.put(request, responseToCache));
+
+        return response;
+    });
 }
 
-// Handle offline functionality
+// Background sync
 self.addEventListener('sync', event => {
-    if (event.tag === 'sync-calculations') {
+    if (event.tag === 'syncCalculations') {
         event.waitUntil(syncCalculations());
     }
 });
 
-// Periodic sync for updates
+// Periodic sync
 self.addEventListener('periodicsync', event => {
     if (event.tag === 'update-cache') {
         event.waitUntil(updateCache());
     }
 });
 
+// Function to sync calculations
 async function syncCalculations() {
-    // Implement offline calculations sync
-    const offlineData = await getOfflineData();
-    if (offlineData) {
-        try {
-            // Sync with server when online
-            await syncWithServer(offlineData);
-        } catch (error) {
-            console.error('Sync failed:', error);
-        }
+    try {
+        const cache = await caches.open(DYNAMIC_CACHE);
+        const requests = await cache.keys();
+        const calculations = requests.filter(request => 
+            request.url.includes('/calculations/')
+        );
+
+        await Promise.all(calculations.map(async request => {
+            try {
+                const response = await fetch(request);
+                await cache.put(request, response);
+            } catch (error) {
+                console.error('Error syncing calculation:', error);
+            }
+        }));
+    } catch (error) {
+        console.error('Error in syncCalculations:', error);
     }
 }
 
+// Function to update cache
 async function updateCache() {
     try {
-        await caches.delete(DYNAMIC_CACHE);
-        const cache = await caches.open(DYNAMIC_CACHE);
-        await cache.addAll(STATIC_ASSETS);
+        const cache = await caches.open(STATIC_CACHE);
+        await Promise.all(
+            STATIC_ASSETS.map(async asset => {
+                try {
+                    const response = await fetch(asset);
+                    await cache.put(asset, response);
+                } catch (error) {
+                    console.error('Error updating cache for asset:', asset, error);
+                }
+            })
+        );
     } catch (error) {
-        console.error('Cache update failed:', error);
+        console.error('Error in updateCache:', error);
     }
-} 
+}
