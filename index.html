@@ -1,96 +1,399 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Previous HTML content with updated JavaScript -->
-<script>
-    function updateSuggestions() {
-        const totalMarks = parseInt(document.getElementById('totalMarks').value) || 0;
-        const roundedMarks = roundToValidMarks(totalMarks);
-        const suggestionsDiv = document.getElementById('suggestions');
-        let suggestions = '';
-
-        // Update short question choices based on total marks
-        const choiceInfo = document.getElementById('choiceInfo');
-        const minChoices = roundedMarks > 30 ? 3 : 2;
-        choiceInfo.textContent = `Choose any ${minChoices}`;
-        choiceInfo.classList.add('updating');
-        setTimeout(() => choiceInfo.classList.remove('updating'), 500);
-
-        if (roundedMarks >= 20) {
-            const longMarks = 8;
-            const remainingMarks = roundedMarks - longMarks;
-            const baseShortQuestions = Math.floor(remainingMarks * 0.6 / 2); // 60% for short questions
-            const baseMCQs = Math.min(8, Math.floor(remainingMarks * 0.4)); // 40% for MCQs
-            const totalShortQuestions = baseShortQuestions + (roundedMarks > 30 ? 3 : 2); // Add extra for choice based on marks
-
-            suggestions = `
-                <h3>Suggested Distributions (${roundedMarks} marks)</h3>
-                <div class="choice-box" onclick="applySuggestion(1, ${roundedMarks})">
-                    <p>
-                        <span>${baseMCQs} MCQ + ${totalShortQuestions} S/Q (choose ${minChoices}) + 1 L/Q</span>
-                        <span class="marks-total">${roundedMarks}m</span>
-                    </p>
-                    <div class="distribution-info">
-                        MCQ: ${baseMCQs}m • Short: ${baseShortQuestions * 2}m • Long: 8m
-                    </div>
-                </div>
-                <div class="choice-box" onclick="applySuggestion(2, ${roundedMarks})">
-                    <p>
-                        <span>${baseMCQs - 1} MCQ + ${totalShortQuestions + 1} S/Q (choose ${minChoices}) + 1 L/Q</span>
-                        <span class="marks-total">${roundedMarks}m</span>
-                    </p>
-                    <div class="distribution-info">
-                        MCQ: ${baseMCQs - 1}m • Short: ${(baseShortQuestions + 1) * 2}m • Long: 8m
-                    </div>
-                </div>
-                <div class="choice-box" onclick="applySuggestion(3, ${roundedMarks})">
-                    <p>
-                        <span>${baseMCQs + 1} MCQ + ${totalShortQuestions - 1} S/Q (choose ${minChoices}) + 1 L/Q</span>
-                        <span class="marks-total">${roundedMarks}m</span>
-                    </p>
-                    <div class="distribution-info">
-                        MCQ: ${baseMCQs + 1}m • Short: ${(baseShortQuestions - 1) * 2}m • Long: 8m
-                    </div>
-                </div>
-            `;
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Marks Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2196F3;
+            --background-color: #f5f5f5;
+            --text-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        suggestionsDiv.innerHTML = suggestions;
-        document.getElementById('totalMarks').value = roundedMarks;
-        
-        // Update marks badge
-        const totalMarksBadge = document.getElementById('totalMarksBadge');
-        if (totalMarksBadge) {
-            animateNumber(totalMarksBadge, roundedMarks);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        // Show choice info message
-        showAdjustmentMessage(`Short Questions: Choose any ${minChoices} from the given questions`);
-    }
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
 
-    function calculate(isFromRandomize = false) {
-        const mcqs = parseInt(document.getElementById('mcqCount').value);
-        const shorts = parseInt(document.getElementById('shortCount').value);
-        const mcqMarks = mcqs * 1;
-        const shortMarks = shorts * 2;
-        const longMarks = 8;
-        let totalCalculated = mcqMarks + shortMarks + longMarks;
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .choice-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .choice-box:hover {
+            background-color: #f8f8f8;
+            transform: translateY(-2px);
+            box-shadow: var(--box-shadow);
+        }
+
+        .marks-total {
+            float: right;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .distribution-info {
+            font-size: 14px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        #choiceInfo {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            display: inline-block;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+        }
+
+        #choiceInfo.updating {
+            transform: scale(1.1);
+        }
+
+        #totalMarksBadge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: var(--box-shadow);
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px var(--primary-color); }
+            50% { box-shadow: 0 0 20px var(--primary-color); }
+            100% { box-shadow: 0 0 5px var(--primary-color); }
+        }
+
+        #chart-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            button {
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Marks Calculator</h1>
         
-        // Round to valid marks if needed
-        totalCalculated = roundToValidMarks(totalCalculated);
-        
-        // Update choice info based on total marks
-        const minChoices = totalCalculated > 30 ? 3 : 2;
-        const choiceInfo = document.getElementById('choiceInfo');
-        if (choiceInfo) {
+        <div class="input-group">
+            <label for="totalMarks">Total Marks:</label>
+            <input type="number" id="totalMarks" min="20" max="100" value="50" onchange="updateSuggestions()">
+        </div>
+
+        <div class="input-group">
+            <label for="mcqCount">Number of MCQs:</label>
+            <input type="number" id="mcqCount" min="0" value="5" onchange="calculate()">
+        </div>
+
+        <div class="input-group">
+            <label for="shortCount">Number of Short Questions:</label>
+            <input type="number" id="shortCount" min="0" value="4" onchange="calculate()">
+        </div>
+
+        <div id="choiceInfo">Choose any 3</div>
+
+        <button onclick="updateSuggestions()">Show Suggestions</button>
+        <button onclick="randomizeDistribution()">Randomize</button>
+
+        <div id="suggestions"></div>
+        <div id="chart-container">
+            <canvas id="marksChart"></canvas>
+        </div>
+    </div>
+
+    <div id="totalMarksBadge">50 marks</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let chart = null;
+
+        function roundToValidMarks(marks) {
+            return Math.max(20, Math.min(100, Math.round(marks)));
+        }
+
+        function updateSuggestions() {
+            const totalMarks = parseInt(document.getElementById('totalMarks').value) || 0;
+            const roundedMarks = roundToValidMarks(totalMarks);
+            const suggestionsDiv = document.getElementById('suggestions');
+            let suggestions = '';
+
+            const choiceInfo = document.getElementById('choiceInfo');
+            const minChoices = roundedMarks > 30 ? 3 : 2;
             choiceInfo.textContent = `Choose any ${minChoices}`;
             choiceInfo.classList.add('updating');
             setTimeout(() => choiceInfo.classList.remove('updating'), 500);
+
+            if (roundedMarks >= 20) {
+                const longMarks = 8;
+                const remainingMarks = roundedMarks - longMarks;
+                const baseShortQuestions = Math.floor(remainingMarks * 0.6 / 2);
+                const baseMCQs = Math.min(8, Math.floor(remainingMarks * 0.4));
+                const totalShortQuestions = baseShortQuestions + (roundedMarks > 30 ? 3 : 2);
+
+                suggestions = `
+                    <h3>Suggested Distributions (${roundedMarks} marks)</h3>
+                    <div class="choice-box" onclick="applySuggestion(1, ${roundedMarks})">
+                        <p>
+                            <span>${baseMCQs} MCQ + ${totalShortQuestions} S/Q (choose ${minChoices}) + 1 L/Q</span>
+                            <span class="marks-total">${roundedMarks}m</span>
+                        </p>
+                        <div class="distribution-info">
+                            MCQ: ${baseMCQs}m • Short: ${baseShortQuestions * 2}m • Long: 8m
+                        </div>
+                    </div>
+                    <div class="choice-box" onclick="applySuggestion(2, ${roundedMarks})">
+                        <p>
+                            <span>${baseMCQs - 1} MCQ + ${totalShortQuestions + 1} S/Q (choose ${minChoices}) + 1 L/Q</span>
+                            <span class="marks-total">${roundedMarks}m</span>
+                        </p>
+                        <div class="distribution-info">
+                            MCQ: ${baseMCQs - 1}m • Short: ${(baseShortQuestions + 1) * 2}m • Long: 8m
+                        </div>
+                    </div>
+                    <div class="choice-box" onclick="applySuggestion(3, ${roundedMarks})">
+                        <p>
+                            <span>${baseMCQs + 1} MCQ + ${totalShortQuestions - 1} S/Q (choose ${minChoices}) + 1 L/Q</span>
+                            <span class="marks-total">${roundedMarks}m</span>
+                        </p>
+                        <div class="distribution-info">
+                            MCQ: ${baseMCQs + 1}m • Short: ${(baseShortQuestions - 1) * 2}m • Long: 8m
+                        </div>
+                    </div>
+                `;
+            }
+
+            suggestionsDiv.innerHTML = suggestions;
+            document.getElementById('totalMarks').value = roundedMarks;
+            
+            const totalMarksBadge = document.getElementById('totalMarksBadge');
+            if (totalMarksBadge) {
+                animateNumber(totalMarksBadge, roundedMarks);
+            }
+
+            calculate();
         }
 
-        // Rest of the calculate function remains the same...
-        // (Previous calculate function code continues here)
-    }
+        function calculate(isFromRandomize = false) {
+            const mcqs = parseInt(document.getElementById('mcqCount').value) || 0;
+            const shorts = parseInt(document.getElementById('shortCount').value) || 0;
+            const mcqMarks = mcqs * 1;
+            const shortMarks = shorts * 2;
+            const longMarks = 8;
+            let totalCalculated = mcqMarks + shortMarks + longMarks;
+            
+            totalCalculated = roundToValidMarks(totalCalculated);
+            
+            const minChoices = totalCalculated > 30 ? 3 : 2;
+            const choiceInfo = document.getElementById('choiceInfo');
+            if (choiceInfo) {
+                choiceInfo.textContent = `Choose any ${minChoices}`;
+                choiceInfo.classList.add('updating');
+                setTimeout(() => choiceInfo.classList.remove('updating'), 500);
+            }
 
-    // Rest of your JavaScript code remains the same...
-</script>
+            if (!isFromRandomize) {
+                document.getElementById('totalMarks').value = totalCalculated;
+            }
+
+            updateChart(mcqMarks, shortMarks, longMarks);
+            
+            const totalMarksBadge = document.getElementById('totalMarksBadge');
+            if (totalMarksBadge) {
+                animateNumber(totalMarksBadge, totalCalculated);
+            }
+        }
+
+        function updateChart(mcqMarks, shortMarks, longMarks) {
+            const ctx = document.getElementById('marksChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['MCQs', 'Short Questions', 'Long Question'],
+                    datasets: [{
+                        data: [mcqMarks, shortMarks, longMarks],
+                        backgroundColor: [
+                            '#4CAF50',
+                            '#2196F3',
+                            '#FFC107'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function applySuggestion(type, totalMarks) {
+            const longMarks = 8;
+            const remainingMarks = totalMarks - longMarks;
+            const baseShortQuestions = Math.floor(remainingMarks * 0.6 / 2);
+            const baseMCQs = Math.min(8, Math.floor(remainingMarks * 0.4));
+            const minChoices = totalMarks > 30 ? 3 : 2;
+            
+            let mcqs, shorts;
+            
+            switch(type) {
+                case 1:
+                    mcqs = baseMCQs;
+                    shorts = baseShortQuestions + minChoices;
+                    break;
+                case 2:
+                    mcqs = baseMCQs - 1;
+                    shorts = baseShortQuestions + minChoices + 1;
+                    break;
+                case 3:
+                    mcqs = baseMCQs + 1;
+                    shorts = baseShortQuestions + minChoices - 1;
+                    break;
+            }
+            
+            document.getElementById('mcqCount').value = mcqs;
+            document.getElementById('shortCount').value = shorts;
+            calculate();
+        }
+
+        function randomizeDistribution() {
+            const totalMarks = parseInt(document.getElementById('totalMarks').value) || 50;
+            const longMarks = 8;
+            const remainingMarks = totalMarks - longMarks;
+            
+            const minMCQs = Math.floor(remainingMarks * 0.3 / 1);
+            const maxMCQs = Math.floor(remainingMarks * 0.5 / 1);
+            const mcqs = Math.floor(Math.random() * (maxMCQs - minMCQs + 1)) + minMCQs;
+            
+            const minShorts = Math.ceil((remainingMarks - mcqs) / 2);
+            const shorts = minShorts;
+            
+            document.getElementById('mcqCount').value = mcqs;
+            document.getElementById('shortCount').value = shorts;
+            calculate(true);
+        }
+
+        function animateNumber(element, target) {
+            const start = parseInt(element.textContent) || 0;
+            const duration = 1000;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const current = Math.round(start + (target - start) * progress);
+                element.textContent = `${current} marks`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        // Initialize
+        updateSuggestions();
+    </script>
+</body>
 </html>
