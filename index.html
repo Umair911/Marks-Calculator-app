@@ -1070,98 +1070,6 @@
             from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* PWA Install Prompt Styles */
-        #installPrompt {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--gradient-1);
-            padding: 12px 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            display: none;
-            align-items: center;
-            gap: 12px;
-            z-index: 1000;
-            animation: slideUp 0.3s ease-out;
-        }
-
-        #installPrompt button {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        #installPrompt button:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        #installPrompt .close {
-            background: transparent;
-            padding: 4px;
-            margin-left: auto;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translate(-50%, 100%);
-                opacity: 0;
-            }
-            to {
-                transform: translate(-50%, 0);
-                opacity: 1;
-            }
-        }
-
-        /* Offline Indicator */
-        #offlineIndicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--gradient-3);
-            padding: 8px 16px;
-            border-radius: 8px;
-            display: none;
-            align-items: center;
-            gap: 8px;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-
-        .valid-marks {
-            font-size: 0.8em;
-            color: var(--text-secondary);
-            font-weight: normal;
-            background: rgba(99, 102, 241, 0.1);
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 8px;
-        }
-
-        .input-group input:invalid {
-            border-color: #ef4444;
-            animation: shake 0.5s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
     </style>
 </head>
 <body>
@@ -1453,53 +1361,30 @@
             const mcqMarks = mcqs * 1;
             const shortMarks = shorts * 2;
             const longMarks = 8;
+            
+            const mcqMarks = mcqCount * 1;
+            const shortMarks = shortCount * 2;
             let totalCalculated = mcqMarks + shortMarks + longMarks;
-            
-            // Round to valid marks if needed
-            totalCalculated = roundToValidMarks(totalCalculated);
-            
-            // Adjust MCQs if needed to reach valid total
-            if (!isFromRandomize) {
-                const mcqInput = document.getElementById('mcqCount');
-                const currentMCQs = parseInt(mcqInput.value);
-                const difference = totalCalculated - (currentMCQs + shortMarks + longMarks);
-                
-                if (difference !== 0) {
-                    const newMCQCount = currentMCQs + difference;
-                    if (newMCQCount >= 5 && newMCQCount <= 8) {
-                        mcqInput.value = newMCQCount;
-                        showAdjustmentMessage(`Adjusted MCQs to ${newMCQCount} to reach ${totalCalculated} marks`);
-                    }
-                }
+
+            // Update choice info based on total marks
+            const choiceInfo = document.getElementById('choiceInfo');
+            choiceInfo.textContent = totalCalculated <= 30 ? 'Choose 2 questions' : 'Choose 3 questions';
+
+            // Round to valid marks
+            const targetTotal = roundToValidMarks(totalCalculated);
+            if (targetTotal !== totalCalculated) {
+                const newMCQCount = adjustMCQsToReachTarget(totalCalculated, targetTotal);
+                totalCalculated = (newMCQCount * 1) + shortMarks + longMarks;
             }
 
-            // Add animation to pie center
-            const pieCenter = document.querySelector('.pie-center');
-            pieCenter.classList.remove('animate');
-            void pieCenter.offsetWidth; // Trigger reflow
-            pieCenter.classList.add('animate');
+            document.getElementById('totalMarks').value = totalCalculated;
+            document.getElementById('totalMarksBadge').textContent = totalCalculated;
 
-            // Update displays with animation
-            const totalDisplay = document.querySelector('.pie-center .total-number');
-            const totalMarksBadge = document.getElementById('totalMarksBadge');
-            
-            if (totalDisplay) {
-                animateNumber(totalDisplay, totalCalculated);
-            }
-            
-            if (totalMarksBadge) {
-                animateNumber(totalMarksBadge, totalCalculated);
-                
-                // Add a subtle pulse animation to the badge
-                const marksBadge = totalMarksBadge.closest('.marks-badge');
-                if (marksBadge) {
-                    marksBadge.classList.remove('success-pulse');
-                    void marksBadge.offsetWidth; // Trigger reflow
-                    marksBadge.classList.add('success-pulse');
-                }
-            }
-            
-            // Update pie chart distribution
+            // Show preview panel
+            const previewPanel = document.getElementById('previewPanel');
+            previewPanel.style.display = 'block';
+
+            // Update pie chart
             const mcqPercent = (mcqMarks / totalCalculated) * 100;
             const shortPercent = (shortMarks / totalCalculated) * 100;
             const longPercent = (longMarks / totalCalculated) * 100;
@@ -1508,24 +1393,17 @@
             document.documentElement.style.setProperty('--short-deg', `${((mcqPercent + shortPercent) / 100) * 360}deg`);
             
             // Update stat cards
-            const mcqValue = document.getElementById('mcqValue');
-            const shortValue = document.getElementById('shortValue');
-            
-            if (mcqValue) animateNumber(mcqValue, mcqs);
-            if (shortValue) animateNumber(shortValue, shorts);
-            
-            // Update result section
-            const result = document.getElementById('result');
-            result.innerHTML = `
-                <h3>Distribution Results:</h3>
-                <p>MCQs: ${mcqs} × 1 = ${mcqMarks} marks (${Math.round(mcqMarks/totalCalculated*100)}%)</p>
-                <p>Short Questions: ${shorts} × 2 = ${shortMarks} marks (${Math.round(shortMarks/totalCalculated*100)}%)</p>
-                <p>Long Question: 1 × 8 = ${longMarks} marks (${Math.round(longMarks/totalCalculated*100)}%)</p>
-                <p style="font-size: 1.2em; font-weight: bold; margin-top: 15px;">
-                    Total Marks: ${totalCalculated}
-                </p>
-            `;
-            result.style.display = 'block';
+            updateStatCardMarks(document.querySelector('.stat-mcq'), '1 mark each');
+            updateStatCardMarks(document.querySelector('.stat-short'), '2 marks each');
+            updateStatCardMarks(document.querySelector('.stat-long'), '8 marks total');
+
+            // Update distribution bar
+            updateDistributionBar(mcqPercent, shortPercent, longPercent);
+
+            // Clear error message
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.style.display = 'none';
+            errorMsg.classList.remove('error');
 
             // Add to history
             addToHistory({

@@ -67,4 +67,4 @@ MIT License - Feel free to use and modify
 ## 👨‍💻 Developer
 
 Created by Umair
-- GitHub: [@Umair911](https://github.com/Umair911) 
+- GitHub: [@Umair911](https://github.com/Umair911)
